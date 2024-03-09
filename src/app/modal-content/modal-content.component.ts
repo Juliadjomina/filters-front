@@ -35,8 +35,8 @@ export class ModalContentComponent implements OnInit, AfterViewChecked{
     const c = this.comparisonOperatorService.getComparisonOperator().subscribe({
       next: (res) => {
         this.comparisonOperators = this.transformComparisonOperator(res);
-        console.log(res)
-        console.log("a")
+        // console.log(res)
+        // console.log("a")
       }
     });
   }
@@ -63,7 +63,7 @@ export class ModalContentComponent implements OnInit, AfterViewChecked{
   handleOptionSelected(option: string, i: number) {
     const criteriaList = this.filterForm.get('criteriaList') as FormArray;
     const criteriaFormGroup = criteriaList.at(i) as FormGroup;
-    criteriaFormGroup.value['type'] = option;
+    criteriaFormGroup.controls['type'].setValue(option);
   }
 
 
@@ -84,12 +84,12 @@ export class ModalContentComponent implements OnInit, AfterViewChecked{
 
   test(optionSelected: AbstractControl<any>): string {
     const a = optionSelected as FormGroup;
+    console.log(a)
     console.log(a.value['type'])
     return a.value['type'];
   }
 
   get list(): FormArray {
-
     return this.filterForm.controls["criteriaList"] as FormArray;
   }
 
@@ -112,8 +112,8 @@ export class ModalContentComponent implements OnInit, AfterViewChecked{
   saveFilter(): void {
     if (this.filterForm.valid) {
       // Here you can implement saving logic to your backend API
-      console.log('Filter Name:', this.filterForm.value.filterName);
-      console.log('Criteria List:', this.filterForm.value.criteriaList);
+      // console.log('Filter Name:', this.filterForm.value.filterName);
+      // console.log('Criteria List:', this.filterForm.value.criteriaList);
       // Example of sending data to backend API
       // this.http.post('your-api-url', this.filterForm.value).subscribe(response => {
       //   console.log('Response:', response);

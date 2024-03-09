@@ -15,7 +15,7 @@
       <p style="margin-right: 10px;" >Criteria</p>
       <div *ngFor="let criteriaList of list.controls; let i = index" class="test" [formGroupName]="i">
 
-        <app-dropdown defaultValue="NUMBER"[options]="criteriaTypes"
+        <app-dropdown  [defaultValue]="criteriaList.value.type" [options]="criteriaTypes"
                       (optionSelected)="handleOptionSelected($event, i)"
                       class="example-full-width">
         </app-dropdown>
