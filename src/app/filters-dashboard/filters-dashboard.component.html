@@ -1,0 +1,38 @@
+<mat-button-toggle-group [(ngModel)]="fontStyle" name="fontStyle" aria-label="Font Style" #group="matButtonToggleGroup">
+  <mat-button-toggle value="modal">Modal</mat-button-toggle>
+  <mat-button-toggle value="non-modal">Non-modal</mat-button-toggle>
+</mat-button-toggle-group>
+
+<mat-selection-list #shoes [multiple]="false" hideSingleSelectionIndicator style="width: 50%">
+  <ng-container *ngFor="let shoe of typesOfShoes; let i = index" >
+    <mat-list-option id="allOption" [value]="shoe" (click)="getCriterias(shoe.id)">Filter name: {{ shoe.filterName }}
+    </mat-list-option>
+    <div *ngIf="shoes.selectedOptions.hasValue() && shoes.selectedOptions.selected[0].value == shoe">
+      <ng-container >
+        <table mat-table [dataSource]="criterias" class="mat-elevation-z8">
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef> Type </th>
+            <td mat-cell *matCellDef="let element"> {{element.comparisonOperator.operatorType}} </td>
+          </ng-container>
+          <ng-container matColumnDef="operator">
+            <th mat-header-cell *matHeaderCellDef> Operator </th>
+            <td mat-cell *matCellDef="let element"> {{element.comparisonOperator.operatorName}} </td>
+          </ng-container>
+          <ng-container matColumnDef="value">
+            <th mat-header-cell *matHeaderCellDef> Value </th>
+            <td mat-cell *matCellDef="let element"> {{getValue(element)}} </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </ng-container>
+    </div>
+  </ng-container>
+</mat-selection-list>
+
+<app-modal [showModal]="fontStyle" [comparisonOperators]="comparisonOperators" [criteriaTypes]="criteriaTypes"></app-modal>
+
+<!--<app-modal *ngIf="checked" [comparisonOperators]="comparisonOperators" [criteriaTypes]="criteriaTypes"></app-modal>-->
+
+<!--<app-modal-content  *ngIf="!checked" [comparisonOperators]="comparisonOperators" [criteriaTypes]="criteriaTypes" ></app-modal-content>-->
+

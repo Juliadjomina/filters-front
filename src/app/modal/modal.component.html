@@ -1,0 +1,3 @@
+<button mat-raised-button *ngIf="showModal === 'modal'" (click)="openDialog()">Add filter</button>
+
+<app-modal-content  *ngIf="showModal === 'non-modal'" [comparisonOperators]="comparisonOperators" [criteriaTypes]="criteriaTypes" ></app-modal-content>

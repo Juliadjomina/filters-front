@@ -1,0 +1,53 @@
+<h2 mat-dialog-title style="background-color: #5ebecb">Filter</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="filterForm" (ngSubmit)="saveFilter()">
+    <div style="display: flex;">
+      <p style="margin-right: 10px;" class="centered">Filter name</p>
+      <mat-form-field id="filterName" appearance="outline"
+                      [floatLabel]="'auto'" style="margin-right: 10px;" class="centered">
+        <input formControlName="filterName" matInput placeholder="My Filter 1" required >
+      </mat-form-field>
+    </div>
+
+    <div style="display: flex">
+      <div formArrayName="criteriaList">
+      <p style="margin-right: 10px;" >Criteria</p>
+      <div *ngFor="let criteriaList of list.controls; let i = index" class="test" [formGroupName]="i">
+
+        <app-dropdown defaultValue="NUMBER"[options]="criteriaTypes"
+                      (optionSelected)="handleOptionSelected($event, i)"
+                      class="example-full-width">
+        </app-dropdown>
+
+
+        <app-dropdown [options]="getComparisonOperators(i)" (optionSelected)="setComparisonOperator($event, i)" class="example-full-width" >
+        </app-dropdown>
+
+        <mat-form-field  appearance="outline" *ngIf="test(list.at(i)) === 'NUMBER'">
+          <mat-label>Favorite food</mat-label>
+          <input formControlName="value"   type="number" matInput placeholder="Ex. Pizza" value="Sushi" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" *ngIf="test(list.at(i))  === 'TEXT'" >
+          <mat-label>Favorite food</mat-label>
+          <input  formControlName="value" type="text" matInput placeholder="Ex. Pizza" value="Sushi" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" *ngIf="test(list.at(i))  === 'DATE'">
+          <mat-label>Choose a date</mat-label>
+          <input  formControlName="value" matInput [matDatepicker]="picker">
+          <mat-hint>MM/DD/YYYY</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      </div>
+
+
+    </div>
+    <button type="button" (click)="addCriteria()">Add Criteria</button>
+    <button type="submit">Save Filter</button>
+  </form>
+</mat-dialog-content>

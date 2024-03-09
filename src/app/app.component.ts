@@ -7,4 +7,9 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'filters_front';
+
+  handleOptionSelected(option: string) {
+    console.log('Selected Option:', option);
+    // You can perform further actions here
+  }
 }

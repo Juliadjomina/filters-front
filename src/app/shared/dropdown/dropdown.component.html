@@ -1,0 +1,9 @@
+
+<mat-form-field  appearance="outline" class="select-data-row">
+  <mat-select [(value)]="selectedOption"  (selectionChange)="selectOption($event.value)">
+    <ng-container *ngFor="let option of options; let i = index">
+      <mat-option [value]="option.name">{{ option.name }}</mat-option>
+    </ng-container>
+  </mat-select>
+</mat-form-field>
+
