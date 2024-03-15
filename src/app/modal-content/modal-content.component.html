@@ -1,53 +1,55 @@
-<h2 mat-dialog-title style="background-color: #5ebecb">Filter</h2>
-
-<mat-dialog-content>
+<div  [ngClass]="showModal === 'non-modal' ? 'widthtest' : undefined" style="max-height: 40%">
+<h2 mat-dialog-title class="title" >Filter</h2>
+<mat-dialog-content >
   <form [formGroup]="filterForm" (ngSubmit)="saveFilter()">
     <div style="display: flex;">
-      <p style="margin-right: 10px;" class="centered">Filter name</p>
+      <p [ngClass]="showModal === 'non-modal' ? 'test' : undefined" style="margin-right: 10px;" class="centered">Filter name</p>
       <mat-form-field id="filterName" appearance="outline"
                       [floatLabel]="'auto'" style="margin-right: 10px;" class="centered">
-        <input formControlName="filterName" matInput placeholder="My Filter 1" required >
+        <input formControlName="filterName" matInput placeholder="My Filter 1" required>
       </mat-form-field>
     </div>
-
-    <div style="display: flex">
-      <div formArrayName="criteriaList">
-      <p style="margin-right: 10px;" >Criteria</p>
-      <div *ngFor="let criteriaList of list.controls; let i = index" class="test" [formGroupName]="i">
-
-        <app-dropdown  [defaultValue]="criteriaList.value.type" [options]="criteriaTypes"
-                      (optionSelected)="handleOptionSelected($event, i)"
-                      class="example-full-width">
-        </app-dropdown>
+    <div style="display: flex;">
+    <p [ngClass]="showModal === 'non-modal' ? 'test' : undefined" style="margin-right: 10px;" >Criteria</p>
+    <div  formArrayName="criteriaList" style="height: 100%;max-height: 40vh; overflow-y: auto;">
+        <div style="margin-left: 30px;" *ngFor="let criteriaList of criteriaListAllData.controls; let i = index" class="test" [formGroupName]="i">
+          <app-dropdown [defaultValue]="criteriaList.value.type" [options]="criteriaTypes"
+                        (optionSelected)="handleOptionSelected($event, i)"
+                        class="criteria-mat-form-filed">
+          </app-dropdown>
 
 
-        <app-dropdown [options]="getComparisonOperators(i)" (optionSelected)="setComparisonOperator($event, i)" class="example-full-width" >
-        </app-dropdown>
+          <app-dropdown [options]="getComparisonOperators(i)" (optionSelected)="setComparisonOperator($event, i)"
+                        class="criteria-mat-form-filed">
+          </app-dropdown>
 
-        <mat-form-field  appearance="outline" *ngIf="test(list.at(i)) === 'NUMBER'">
-          <mat-label>Favorite food</mat-label>
-          <input formControlName="value"   type="number" matInput placeholder="Ex. Pizza" value="Sushi" >
-        </mat-form-field>
+          <mat-form-field  class="criteria-mat-form-filed" appearance="outline" *ngIf="getType(criteriaListAllData.at(i)) === 'NUMBER'">
+            <mat-label>Favorite food</mat-label>
+            <input formControlName="value" type="number" matInput placeholder="Ex. Pizza" value="Sushi">
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" *ngIf="test(list.at(i))  === 'TEXT'" >
-          <mat-label>Favorite food</mat-label>
-          <input  formControlName="value" type="text" matInput placeholder="Ex. Pizza" value="Sushi" >
-        </mat-form-field>
+          <mat-form-field class="criteria-mat-form-filed" appearance="outline" *ngIf="getType(criteriaListAllData.at(i))  === 'TEXT'">
+            <mat-label>Favorite food</mat-label>
+            <input formControlName="value" type="text" matInput placeholder="Ex. Pizza" value="Sushi">
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" *ngIf="test(list.at(i))  === 'DATE'">
-          <mat-label>Choose a date</mat-label>
-          <input  formControlName="value" matInput [matDatepicker]="picker">
-          <mat-hint>MM/DD/YYYY</mat-hint>
-          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
-      </div>
-
-      </div>
-
-
+          <mat-form-field  class="criteria-mat-form-filed" appearance="outline" *ngIf="getType(criteriaListAllData.at(i))  === 'DATE'">
+            <mat-label>Choose a date</mat-label>
+            <input formControlName="value" matInput [matDatepicker]="picker">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <button (click)="deleteRow(i)" mat-raised-button color="accent">-</button>
+        </div>
     </div>
-    <button type="button" (click)="addCriteria()">Add Criteria</button>
-    <button type="submit">Save Filter</button>
+    </div>
   </form>
-</mat-dialog-content>
+  <div style="display: flex; justify-content: center;">
+  <button mat-raised-button color="primary" style="background-color: #757575" type="button" (click)="addCriteria()" >Add Criteria</button>
+  </div></mat-dialog-content>
+<mat-dialog-actions style="background-color: #f1f1f1; display: flex; justify-content: center;">
+  <button mat-raised-button color="primary" class="mat-elevation-z0" type="button" (click)="addCriteria()" style="background-color: #757575">Add Criteria</button>
+  <button mat-raised-button color="primary" type="submit" (click)="saveFilter()" style="background-color: #156bba">Save Filter</button>
+</mat-dialog-actions>
+</div>

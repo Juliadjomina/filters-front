@@ -1,9 +1,22 @@
-.example-full-width {
-  margin-right: 10px; /* Adjust the value as needed */
+.criteria-mat-form-filed {
+  margin-right: 10px;
 }
 
 .centered {
   display: flex;
   align-items: center;
-  margin-right: 10px; /* Adjust as needed */
+  margin-right: 10px;
+}
+
+.title {
+  background-color: #5ebecb;
+  color: white
+}
+
+.test {
+  margin-left: 1rem;
+}
+
+.widthtest {
+  width: 90%;
 }

@@ -2,13 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {FiltersService} from "../_services/filters.service";
 import {FilterResponse} from "../_models/filter-response";
 import {CriteriasService} from "../_services/criterias.service";
-import {CriteriaResponse} from "../_models/criteria-response";
-import {CriteriaType} from "../_models/criteria-type";
-import {CriteriaTypeService} from "../_services/criteria-type.service";
-import {ComparisonOperator} from "../_models/comparison-operator";
-import {ComparisonOperatorService} from "../_services/comparison-operator.service";
+import {Criteria} from "../_models/criteria";
 import {SelectorType} from "../_models/selector-type";
-import {ThemePalette} from "@angular/material/core";
+import {MatSelectionList} from "@angular/material/list";
 
 @Component({
   selector: 'app-filters-dashboard',
@@ -17,44 +13,43 @@ import {ThemePalette} from "@angular/material/core";
 
 })
 export class FiltersDashboardComponent implements OnInit {
-  typesOfShoes: FilterResponse[] = [];
-  criterias: CriteriaResponse[] = [];
-  displayedColumns: string[] = ['type', 'operator', 'value'];
+
+  filterResponses: FilterResponse[] = [];
+  criteria: Criteria[] = [];
   criteriaTypes: SelectorType[] = [];
   comparisonOperators: SelectorType[] = [];
-
-  color: ThemePalette = 'primary';
-  fontStyle:string = '';
-  disabled = false;
+  fontStyle: string = '';
+  displayedColumns: string[] = ['type', 'operator', 'value'];
+  previousSelectedIndex: number = -1;
 
   constructor(private filterService: FiltersService,
-              private criteriaService: CriteriasService,
-              private criteriaTypeService: CriteriaTypeService,
-              private comparisonOperatorService: ComparisonOperatorService) {
+              private criteriaService: CriteriasService) {
   }
 
   ngOnInit(): void {
-    const a = this.filterService.getAllFilters().subscribe({
-      next: (res) => {
-        this.typesOfShoes = res;
+    this.filterService.getAllFilters().subscribe({
+      next: (filters) => {
+        this.filterResponses = filters;
       }
     });
-
-
   }
 
-  getCriterias(id: number) {
-    console.log("aaa")
-    const a = this.criteriaService.getCriterias(id).subscribe({
-      next: (res) => {
-        this.criterias = res;
-        console.log(res)
-      }
-    });
-
+  getFilterCriteria(a: MatSelectionList, filterId: number, i: number) {
+    if (this.previousSelectedIndex !== -1 && this.previousSelectedIndex !== i) {
+      const selectedOption = a.options.toArray()[this.previousSelectedIndex];
+      a.selectedOptions.deselect(selectedOption);
+    }
+    if (this.previousSelectedIndex == i) {
+      const selectedOption = a.options.toArray()[this.previousSelectedIndex];
+      a.selectedOptions.deselect(selectedOption);
+    } else {
+      this.criteriaService.getFilterCriterias(filterId)
+        .subscribe(criteria => this.criteria = criteria);
+    }
+    this.previousSelectedIndex = i;
   }
 
-  getValue(criteria: CriteriaResponse): number | string | Date {
+  getCriteriaValue(criteria: Criteria): number | string | Date {
     if (criteria.criteriaType === 'TEXT') {
       return criteria.text;
     } else if (criteria.criteriaType === 'DATE') {

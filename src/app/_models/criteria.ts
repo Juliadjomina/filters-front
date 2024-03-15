@@ -1,6 +1,6 @@
 export interface ComparisonOperator {
   operatorName: string;
-  operatorType: 'Text' | 'Number' | 'Date';
+  operatorType: 'TEXT' | 'NUMBER' | 'DATE';
 }
 
 export interface TextCriteria {
@@ -21,4 +21,4 @@ export interface DateCriteria {
   date: Date;
 }
 
-export type CriteriaResponse = TextCriteria | NumberCriteria | DateCriteria;
+export type Criteria = TextCriteria | NumberCriteria | DateCriteria;

@@ -1,10 +1,13 @@
-import {AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
-import {AbstractControl, FormArray, FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {ChangeDetectorRef, Component, Input} from '@angular/core';
+import {AbstractControl, FormArray, FormBuilder, FormGroup} from "@angular/forms";
 import {SelectorType} from "../_models/selector-type";
 import {CriteriaTypeService} from "../_services/criteria-type.service";
 import {ComparisonOperatorService} from "../_services/comparison-operator.service";
 import {CriteriaType} from "../_models/criteria-type";
 import {ComparisonOperator} from "../_models/comparison-operator";
+import {FiltersService} from "../_services/filters.service";
+import {FilterRequest} from "../_models/filter-request";
+import {Criteria, DateCriteria, NumberCriteria, TextCriteria} from "../_models/criteria";
 
 
 @Component({
@@ -12,58 +15,51 @@ import {ComparisonOperator} from "../_models/comparison-operator";
   templateUrl: './modal-content.component.html',
   styleUrls: ['./modal-content.component.scss']
 })
-export class ModalContentComponent implements OnInit, AfterViewChecked{
+export class ModalContentComponent {
 
+  @Input() showModal: string = '';
   @Input() criteriaTypes: SelectorType[] = [];
   @Input() comparisonOperators: SelectorType[] = [];
-
   filterForm: FormGroup = this.formBuilder.group({
-    filterName: ['', Validators.required],
+    filterName: [''],
     criteriaList: this.formBuilder.array([this.createCriteria()])
   });
-
 
   constructor(private formBuilder: FormBuilder,
               private criteriaTypeService: CriteriaTypeService,
               private comparisonOperatorService: ComparisonOperatorService,
-              private readonly changeDetectorRef: ChangeDetectorRef) {
-    const b = this.criteriaTypeService.getCriteriaTypes().subscribe({
-      next: (res) => {
-        this.criteriaTypes = this.transformCriteria(res);
-      }
+              private readonly changeDetectorRef: ChangeDetectorRef,
+              private filterService: FiltersService) {
+    this.criteriaTypeService.getCriteriaTypes().subscribe(criteriaTypes => {
+      this.criteriaTypes = this.transformCriteriaToSelectorType(criteriaTypes);
     });
-    const c = this.comparisonOperatorService.getComparisonOperator().subscribe({
-      next: (res) => {
-        this.comparisonOperators = this.transformComparisonOperator(res);
-        // console.log(res)
-        // console.log("a")
-      }
+    this.comparisonOperatorService.getComparisonOperator().subscribe(comparisonOperators => {
+      this.comparisonOperators = this.transformComparisonOperatorToSlectorType(comparisonOperators);
     });
   }
 
-  ngAfterViewChecked(): void {
-    this.changeDetectorRef.detectChanges();
-    }
+  // ngAfterViewChecked(): void {
+  //   this.changeDetectorRef.detectChanges();
+  //   }
 
-
-  transformCriteria(criteria: CriteriaType[]): SelectorType[] {
+  transformCriteriaToSelectorType(criteria: CriteriaType[]): SelectorType[] {
     return criteria.map(criterion => ({
       name: criterion.type,
-      value: "" // You can set any default value here
+      value: ""
     }));
   }
 
-  transformComparisonOperator(criteria: ComparisonOperator[]): SelectorType[] {
+  transformComparisonOperatorToSlectorType(criteria: ComparisonOperator[]): SelectorType[] {
     return criteria.map(criterion => ({
       name: criterion.operatorName,
-      value: criterion.operatorType// You can set any default value here
+      value: criterion.operatorType
     }));
   }
 
-  handleOptionSelected(option: string, i: number) {
+  handleOptionSelected(value: string, index: number) {
     const criteriaList = this.filterForm.get('criteriaList') as FormArray;
-    const criteriaFormGroup = criteriaList.at(i) as FormGroup;
-    criteriaFormGroup.controls['type'].setValue(option);
+    const criteriaFormGroup = criteriaList.at(index) as FormGroup;
+    criteriaFormGroup.controls['type'].setValue(value);
   }
 
 
@@ -74,53 +70,100 @@ export class ModalContentComponent implements OnInit, AfterViewChecked{
   }
 
   setComparisonOperator(option: string, i: number) {
-    // console.log('Selected Option:', option);
     const criteriaList = this.filterForm.get('criteriaList') as FormArray;
     const criteriaFormGroup = criteriaList.at(i) as FormGroup;
-    criteriaFormGroup.value['comparisonOperator'] = option;
-    // console.log(criteriaFormGroup.value['comparisonOperator'])
+    criteriaFormGroup.controls['comparisonOperator'].setValue(option);
   }
 
 
-  test(optionSelected: AbstractControl<any>): string {
-    const a = optionSelected as FormGroup;
-    console.log(a)
-    console.log(a.value['type'])
-    return a.value['type'];
+  getType(optionSelected: AbstractControl<any>): string {
+    return optionSelected.value['type'];
   }
 
-  get list(): FormArray {
+  get criteriaListAllData(): FormArray {
     return this.filterForm.controls["criteriaList"] as FormArray;
-  }
-
-  ngOnInit(): void {
   }
 
   createCriteria(): FormGroup {
     return this.formBuilder.group({
-      type: ['NUMBER', Validators.required],
-      value: ['', Validators.required],
-      comparisonOperator: ['', Validators.required]
+      type: ['NUMBER'],
+      value: [''],
+      comparisonOperator: ['']
     });
   }
 
   addCriteria(): void {
-    const criteriaList = this.filterForm.get('criteriaList') as FormArray;
-    criteriaList.push(this.createCriteria());
+    (this.filterForm.get('criteriaList') as FormArray).push(this.createCriteria());
+  }
+
+  collectFilterData(): FilterRequest {
+    return {
+      filterName: this.filterForm.get('filterName')?.value,
+      criteriaList: this.mapFormArrayToCriteriaList(this.filterForm.get('criteriaList') as FormArray)
+    };
+  }
+
+  mapFormArrayToCriteriaList(criteriaList: FormArray): Criteria[] {
+    const criteriaResponses: Criteria[] = [];
+    criteriaList.controls.forEach((criteriaGroup: AbstractControl) => {
+      if (criteriaGroup instanceof FormGroup) {
+        const type = criteriaGroup.get('type')?.value;
+        const comparisonOperator = criteriaGroup.get('comparisonOperator')?.value;
+        const criteria = this.collectCriteria(type, comparisonOperator, criteriaGroup);
+        if (criteria) {
+          criteriaResponses.push(<TextCriteria | NumberCriteria | DateCriteria>criteria);
+        }
+      }
+    });
+    return criteriaResponses;
   }
 
   saveFilter(): void {
     if (this.filterForm.valid) {
-      // Here you can implement saving logic to your backend API
-      // console.log('Filter Name:', this.filterForm.value.filterName);
-      // console.log('Criteria List:', this.filterForm.value.criteriaList);
-      // Example of sending data to backend API
-      // this.http.post('your-api-url', this.filterForm.value).subscribe(response => {
-      //   console.log('Response:', response);
-      // });
+      this.filterService.saveFilter(this.collectFilterData()).subscribe();
     } else {
       // Form is invalid, handle validation errors
     }
   }
 
+  deleteRow(index: number) {
+    (this.filterForm.get('criteriaList') as FormArray).removeAt(index);
+  }
+
+  private collectCriteria(type: string, comparisonOperator: string, criteriaGroup: FormGroup<any>) {
+    switch (type) {
+      case 'TEXT': {
+        return  {
+          criteriaType: 'TEXT',
+          comparisonOperator: {
+            operatorName: comparisonOperator,
+            operatorType: 'TEXT'
+          },
+          text: criteriaGroup.get('value')?.value as string
+        };
+      }
+      case 'NUMBER': {
+        return  {
+          criteriaType: 'NUMBER',
+          comparisonOperator: {
+            operatorName: comparisonOperator,
+            operatorType: 'NUMBER'
+          },
+          number: criteriaGroup.get('value')?.value as number
+        };
+      }
+      case 'DATE': {
+        return  {
+          criteriaType: 'DATE',
+          comparisonOperator: {
+            operatorName: comparisonOperator,
+            operatorType: 'DATE'
+          },
+          date: criteriaGroup.get('value')?.value as Date
+        };
+      }
+      default:
+        return '';
+    }
+  }
 }
