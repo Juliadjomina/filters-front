@@ -1,10 +1,12 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {FiltersService} from "../_services/filters.service";
 import {FilterResponse} from "../_models/filter-response";
-import {CriteriasService} from "../_services/criterias.service";
-import {Criteria} from "../_models/criteria";
+import {CriteriaService} from "../_services/criteria.service";
+import {AmountCriteria, Criteria, DateCriteria, TitleCriteria} from "../_models/criteria";
 import {SelectorType} from "../_models/selector-type";
 import {MatSelectionList} from "@angular/material/list";
+import {SharedService} from "../shared/service/shared-service";
+import {AMOUNT, DATE, TITLE} from "../shared/utils/utils";
 
 @Component({
   selector: 'app-filters-dashboard',
@@ -18,23 +20,24 @@ export class FiltersDashboardComponent implements OnInit {
   criteria: Criteria[] = [];
   criteriaTypes: SelectorType[] = [];
   comparisonOperators: SelectorType[] = [];
-  fontStyle: string = '';
-  displayedColumns: string[] = ['type', 'operator', 'value'];
+  formType: string = '';
   previousSelectedIndex: number = -1;
+  displayedColumns: string[] = ['type', 'operator', 'value'];
 
   constructor(private filterService: FiltersService,
-              private criteriaService: CriteriasService) {
+              private criteriaService: CriteriaService,
+              private sharedService: SharedService) {
   }
 
   ngOnInit(): void {
-    this.filterService.getAllFilters().subscribe({
-      next: (filters) => {
-        this.filterResponses = filters;
-      }
+    this.filterService.getAllFilters().subscribe(filters => this.filterResponses = filters);
+    this.sharedService.getData().subscribe(_ => {
+      this.formType = '';
     });
   }
 
   getFilterCriteria(a: MatSelectionList, filterId: number, i: number) {
+    this.criteria = [];
     if (this.previousSelectedIndex !== -1 && this.previousSelectedIndex !== i) {
       const selectedOption = a.options.toArray()[this.previousSelectedIndex];
       a.selectedOptions.deselect(selectedOption);
@@ -43,20 +46,24 @@ export class FiltersDashboardComponent implements OnInit {
       const selectedOption = a.options.toArray()[this.previousSelectedIndex];
       a.selectedOptions.deselect(selectedOption);
     } else {
-      this.criteriaService.getFilterCriterias(filterId)
+      this.criteriaService.getFilterCriteria(filterId)
         .subscribe(criteria => this.criteria = criteria);
     }
     this.previousSelectedIndex = i;
   }
 
   getCriteriaValue(criteria: Criteria): number | string | Date {
-    if (criteria.criteriaType === 'TEXT') {
-      return criteria.text;
-    } else if (criteria.criteriaType === 'DATE') {
-      return criteria.date;
-    } else if (criteria.criteriaType === 'NUMBER') {
-      return criteria.number;
+    if (criteria.criteriaType === TITLE) {
+      return (criteria as TitleCriteria).title;
+    } else if (criteria.criteriaType === DATE) {
+      return (criteria as DateCriteria).date;
+    } else if (criteria.criteriaType === AMOUNT) {
+      return (criteria as AmountCriteria).amount;
     }
-    return 12;
+    return '';
+  }
+
+  @HostListener('changeModalMode') onMouseEnter() {
+    this.formType = '';
   }
 }

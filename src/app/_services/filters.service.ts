@@ -10,10 +10,10 @@ import {FilterRequest} from "../_models/filter-request";
 export class FiltersService extends HttpBaseService {
 
   getAllFilters(): Observable<FilterResponse[]> {
-    return this.http.get<FilterResponse[]>(`${this.apiBaseUrl}/filters`);
+    return this.http.get<FilterResponse[]>(`api/filters`);
   }
 
   saveFilter(data: FilterRequest): Observable<FilterRequest>{
-    return this.http.post<FilterRequest>(`${this.apiBaseUrl}/filters/save`, data);
+    return this.http.post<FilterRequest>(`api/filters/save`, data);
   }
 }

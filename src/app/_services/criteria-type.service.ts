@@ -9,6 +9,6 @@ import {CriteriaType} from "../_models/criteria-type";
 export class CriteriaTypeService extends HttpBaseService {
 
   getCriteriaTypes(): Observable<CriteriaType[]> {
-    return this.http.get<CriteriaType[]>(`${this.apiBaseUrl}/criteria-types`);
+    return this.http.get<CriteriaType[]>(`api/criteria-types`);
   }
 }

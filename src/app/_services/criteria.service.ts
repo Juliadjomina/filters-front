@@ -6,9 +6,9 @@ import {Criteria} from "../_models/criteria";
 @Injectable({
   providedIn: 'root'
 })
-export class CriteriasService extends HttpBaseService {
+export class CriteriaService extends HttpBaseService {
 
-  getFilterCriterias(filterId: number): Observable<Criteria[]> {
-    return this.http.get<Criteria[]>(`${this.apiBaseUrl}/criteria/${filterId}`);
+  getFilterCriteria(filterId: number): Observable<Criteria[]> {
+    return this.http.get<Criteria[]>(`api/criteria/${filterId}`);
   }
 }

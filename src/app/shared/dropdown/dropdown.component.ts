@@ -1,6 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {CriteriaType} from "../../_models/criteria-type";
-import {ComparisonOperator} from "../../_models/comparison-operator";
 import {SelectorType} from "../../_models/selector-type";
 
 @Component({
@@ -22,8 +20,6 @@ export class DropdownComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.optionSelected);
     this.selectedOption = this.defaultValue;
   }
-
 }

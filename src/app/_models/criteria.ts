@@ -1,18 +1,18 @@
 export interface ComparisonOperator {
   operatorName: string;
-  operatorType: 'TEXT' | 'NUMBER' | 'DATE';
+  operatorType: 'TITLE' | 'AMOUNT' | 'DATE';
 }
 
-export interface TextCriteria {
-  criteriaType: 'TEXT';
+export interface TitleCriteria {
+  criteriaType: 'TITLE';
   comparisonOperator: ComparisonOperator;
-  text: string;
+  title: string;
 }
 
-export interface NumberCriteria {
-  criteriaType: 'NUMBER';
+export interface AmountCriteria {
+  criteriaType: 'AMOUNT';
   comparisonOperator: ComparisonOperator;
-  number: number;
+  amount: number;
 }
 
 export interface DateCriteria {
@@ -21,4 +21,4 @@ export interface DateCriteria {
   date: Date;
 }
 
-export type Criteria = TextCriteria | NumberCriteria | DateCriteria;
+export type Criteria = TitleCriteria | AmountCriteria | DateCriteria;

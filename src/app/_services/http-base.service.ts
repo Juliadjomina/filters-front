@@ -7,7 +7,6 @@ import { HttpClient } from '@angular/common/http';
 export class HttpBaseService {
 
   http: HttpClient;
-  apiBaseUrl: string = `http://localhost:8080/api`;
 
   constructor(http: HttpClient) {
     this.http = http;

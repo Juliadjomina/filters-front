@@ -19,11 +19,18 @@ export class ModalComponent {
 
   openDialog() {
     if (this.showModal === 'modal') {
-      this.dialog.open(ModalContentComponent, {
+      const dialogRef = this.dialog.open(ModalContentComponent, {
         disableClose: false,
-        width: '70%',
+        width: '60%',
         data: {criteriaTypes: this.criteriaTypes, comparisonOperator: this.comparisonOperators}
       });
+      dialogRef.componentInstance.closeModal.subscribe(() => {
+        dialogRef.close();
+      });
     }
+  }
+
+  closeDialog() {
+   this.dialog.closeAll();
   }
 }

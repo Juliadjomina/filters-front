@@ -1,5 +1,5 @@
-import {ChangeDetectorRef, Component, Input} from '@angular/core';
-import {AbstractControl, FormArray, FormBuilder, FormGroup} from "@angular/forms";
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {AbstractControl, FormArray, FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {SelectorType} from "../_models/selector-type";
 import {CriteriaTypeService} from "../_services/criteria-type.service";
 import {ComparisonOperatorService} from "../_services/comparison-operator.service";
@@ -7,7 +7,10 @@ import {CriteriaType} from "../_models/criteria-type";
 import {ComparisonOperator} from "../_models/comparison-operator";
 import {FiltersService} from "../_services/filters.service";
 import {FilterRequest} from "../_models/filter-request";
-import {Criteria, DateCriteria, NumberCriteria, TextCriteria} from "../_models/criteria";
+import {AmountCriteria, Criteria, DateCriteria, TitleCriteria} from "../_models/criteria";
+import {MatSnackBar} from "@angular/material/snack-bar";
+import {AMOUNT, DATE, isNullOrWhitespace, isValidCriteriaValue, TITLE} from "../shared/utils/utils";
+import {SharedService} from "../shared/service/shared-service";
 
 
 @Component({
@@ -17,6 +20,7 @@ import {Criteria, DateCriteria, NumberCriteria, TextCriteria} from "../_models/c
 })
 export class ModalContentComponent {
 
+  @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
   @Input() showModal: string = '';
   @Input() criteriaTypes: SelectorType[] = [];
   @Input() comparisonOperators: SelectorType[] = [];
@@ -28,8 +32,9 @@ export class ModalContentComponent {
   constructor(private formBuilder: FormBuilder,
               private criteriaTypeService: CriteriaTypeService,
               private comparisonOperatorService: ComparisonOperatorService,
-              private readonly changeDetectorRef: ChangeDetectorRef,
-              private filterService: FiltersService) {
+              private snackBar: MatSnackBar,
+              private filterService: FiltersService,
+              private sharedService: SharedService) {
     this.criteriaTypeService.getCriteriaTypes().subscribe(criteriaTypes => {
       this.criteriaTypes = this.transformCriteriaToSelectorType(criteriaTypes);
     });
@@ -37,10 +42,6 @@ export class ModalContentComponent {
       this.comparisonOperators = this.transformComparisonOperatorToSlectorType(comparisonOperators);
     });
   }
-
-  // ngAfterViewChecked(): void {
-  //   this.changeDetectorRef.detectChanges();
-  //   }
 
   transformCriteriaToSelectorType(criteria: CriteriaType[]): SelectorType[] {
     return criteria.map(criterion => ({
@@ -64,9 +65,14 @@ export class ModalContentComponent {
 
 
   getComparisonOperators(value: number) {
-    const criteriaList = this.filterForm.get('criteriaList') as FormArray;
-    const criteriaFormGroup = criteriaList.at(value) as FormGroup;
-    return this.comparisonOperators.filter(operator => operator.value === criteriaFormGroup.value['type']);
+    if (value) {
+
+      const criteriaList = this.filterForm.get('criteriaList') as FormArray;
+      const criteriaFormGroup = criteriaList.at(value) as FormGroup;
+      return this.comparisonOperators.filter(operator => operator.value === criteriaFormGroup.value['type']);
+    } else {
+      return this.comparisonOperators.filter(operator => operator.value === AMOUNT);
+    }
   }
 
   setComparisonOperator(option: string, i: number) {
@@ -86,7 +92,7 @@ export class ModalContentComponent {
 
   createCriteria(): FormGroup {
     return this.formBuilder.group({
-      type: ['NUMBER'],
+      type: [AMOUNT],
       value: [''],
       comparisonOperator: ['']
     });
@@ -106,23 +112,58 @@ export class ModalContentComponent {
   mapFormArrayToCriteriaList(criteriaList: FormArray): Criteria[] {
     const criteriaResponses: Criteria[] = [];
     criteriaList.controls.forEach((criteriaGroup: AbstractControl) => {
-      if (criteriaGroup instanceof FormGroup) {
-        const type = criteriaGroup.get('type')?.value;
-        const comparisonOperator = criteriaGroup.get('comparisonOperator')?.value;
-        const criteria = this.collectCriteria(type, comparisonOperator, criteriaGroup);
-        if (criteria) {
-          criteriaResponses.push(<TextCriteria | NumberCriteria | DateCriteria>criteria);
-        }
+      const type = criteriaGroup.get('type')?.value;
+      const comparisonOperator = criteriaGroup.get('comparisonOperator')?.value;
+      const value = criteriaGroup.get('value')?.value;
+      const criteria = this.collectCriteria(type, comparisonOperator, value);
+      if (criteria) {
+        criteriaResponses.push(<TitleCriteria | AmountCriteria | DateCriteria>criteria);
       }
     });
+    if (criteriaResponses.length == 0) {
+      this.openSnackBar("You need at least one criteria to save filter");
+    }
     return criteriaResponses;
   }
 
+  validateCriteria(): boolean {
+    return (this.filterForm.get('criteriaList') as FormArray).controls.every((criteriaGroup: AbstractControl) => {
+      const type = criteriaGroup.get('type')?.value;
+      const comparisonOperator = criteriaGroup.get('comparisonOperator')?.value;
+      const value = criteriaGroup.get('value')?.value;
+      return !isNullOrWhitespace(type) && !isNullOrWhitespace(comparisonOperator) && isValidCriteriaValue(value);
+    });
+  }
+
   saveFilter(): void {
-    if (this.filterForm.valid) {
-      this.filterService.saveFilter(this.collectFilterData()).subscribe();
+    if (!this.validateFilter()) {
+      this.openSnackBar("Filter name should be added");
+      return;
+    }
+    if (!this.validateCriteria()) {
+      this.openSnackBar("All criterias should have comparison type, operator, and value");
+      return;
+    }
+    this.filterService.saveFilter(this.collectFilterData()).subscribe();
+    this.closeModal.emit();
+    this.openSnackBar("Filter is successfully added")
+    if (this.showModal === 'non-modal') {
+      this.filterForm.reset(
+        {
+          filterName: '',
+          criteriaList: this.formBuilder.array([this.createCriteria()])
+        }
+      );
+    }
+    this.sharedService.setData("a");
+  }
+
+  validateFilter() {
+    if (isNullOrWhitespace(this.filterForm.get('filterName')?.value)) {
+      this.filterForm.get('filterName')?.setErrors(Validators.required);
+      return false;
     } else {
-      // Form is invalid, handle validation errors
+      return true;
     }
   }
 
@@ -130,40 +171,56 @@ export class ModalContentComponent {
     (this.filterForm.get('criteriaList') as FormArray).removeAt(index);
   }
 
-  private collectCriteria(type: string, comparisonOperator: string, criteriaGroup: FormGroup<any>) {
+  private collectCriteria(type: string, comparisonOperator: string, value: string | number | Date) {
     switch (type) {
-      case 'TEXT': {
-        return  {
-          criteriaType: 'TEXT',
+      case TITLE: {
+        return {
+          criteriaType: TITLE,
           comparisonOperator: {
             operatorName: comparisonOperator,
-            operatorType: 'TEXT'
+            operatorType: TITLE
           },
-          text: criteriaGroup.get('value')?.value as string
+          title: value as string
         };
       }
-      case 'NUMBER': {
-        return  {
-          criteriaType: 'NUMBER',
+      case AMOUNT: {
+        return {
+          criteriaType: AMOUNT,
           comparisonOperator: {
             operatorName: comparisonOperator,
-            operatorType: 'NUMBER'
+            operatorType: AMOUNT
           },
-          number: criteriaGroup.get('value')?.value as number
+          amount: value as number
         };
       }
-      case 'DATE': {
-        return  {
-          criteriaType: 'DATE',
+      case DATE: {
+        return {
+          criteriaType: DATE,
           comparisonOperator: {
             operatorName: comparisonOperator,
-            operatorType: 'DATE'
+            operatorType: DATE
           },
-          date: criteriaGroup.get('value')?.value as Date
+          date: value as Date
         };
       }
       default:
         return '';
     }
   }
+
+  onCloseModal() {
+    this.closeModal.emit();
+  }
+
+  openSnackBar(message: string) {
+    this.snackBar.open(message, 'Close', {
+      horizontalPosition: "end",
+      verticalPosition: "top",
+      duration: 3000
+    });
+  }
+
+  protected readonly AMOUNT = AMOUNT;
+  protected readonly TITLE = TITLE;
+  protected readonly DATE = DATE;
 }

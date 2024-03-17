@@ -9,6 +9,6 @@ import {ComparisonOperator} from "../_models/comparison-operator";
 export class ComparisonOperatorService extends HttpBaseService {
 
   getComparisonOperator(): Observable<ComparisonOperator[]> {
-    return this.http.get<ComparisonOperator[]>(`${this.apiBaseUrl}/comparison-operators`);
+    return this.http.get<ComparisonOperator[]>(`api/comparison-operators`);
   }
 }
