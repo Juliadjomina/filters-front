@@ -4,7 +4,7 @@
   <ng-container *ngFor="let filter of filterResponses; let i = index" >
     <mat-list-option id="allOption" [value]="filter" (click)="getFilterCriteria(filters, filter.id, i)">Filter name: {{ filter.filterName }}
     </mat-list-option>
-    <div *ngIf="filters.selectedOptions.hasValue() && filters.selectedOptions.selected[0].value == filter">
+    <div *ngIf="criteria.length > 0 && filters.selectedOptions.selected[0].value == filter">
       <ng-container >
         <table aria-description="criteriaTable" mat-table [dataSource]="criteria" class="mat-elevation-z8">
           <ng-container matColumnDef="type">
@@ -27,11 +27,11 @@
   </ng-container>
 </mat-selection-list>
 <div class="IMHERE" style="width: 70%; margin-left: 1rem">
-  <mat-button-toggle-group [(ngModel)]="fontStyle" name="fontStyle" aria-label="Font Style" #group="matButtonToggleGroup">
+  <mat-button-toggle-group [(ngModel)]="formType" name="fontStyle" aria-label="Font Style" #group="matButtonToggleGroup">
     <mat-button-toggle value="modal">Modal</mat-button-toggle>
     <mat-button-toggle value="non-modal">Non-modal</mat-button-toggle>
   </mat-button-toggle-group>
 
-  <app-modal class="modal" [showModal]="fontStyle" [comparisonOperators]="comparisonOperators" [criteriaTypes]="criteriaTypes"></app-modal>
+  <app-modal class="modal" [showModal]="formType" [comparisonOperators]="comparisonOperators" [criteriaTypes]="criteriaTypes"></app-modal>
 </div>
 </div>
