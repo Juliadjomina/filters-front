@@ -1,5 +1,0 @@
-<div class="margin-top">
-  <button class="margin-left" mat-raised-button *ngIf="formType === 'modal'" (click)="openDialog()">Add filter</button>
-  <app-modal-content *ngIf="formType === 'non-modal'" (closeModal)="closeDialog()" [formType]="formType"
-                     [comparisonOperators]="comparisonOperators" [criteriaTypes]="criteriaTypes"></app-modal-content>
-</div>

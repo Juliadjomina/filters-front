@@ -1,0 +1,4 @@
+<div class="margin-top">
+  <button mat-raised-button *ngIf="formType === 'modal'" (click)="openDialog()">Add filter</button>
+  <app-modal-content *ngIf="formType === 'non-modal'" (closeModal)="closeDialog()" [formType]="formType"></app-modal-content>
+</div>

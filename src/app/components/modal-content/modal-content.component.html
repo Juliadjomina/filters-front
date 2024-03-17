@@ -1,56 +1,71 @@
-<div [ngClass]="formType === 'non-modal' ? 'non-modal-width' : undefined" class="modal-content">
+<div [ngClass]="formType === 'non-modal' ? 'non-modal-width' : undefined">
   <h2 mat-dialog-title class="title">Filter</h2>
   <mat-dialog-content class="dialog-content">
+
     <form [formGroup]="filterForm" (ngSubmit)="saveFilter()">
-      <div class="flex">
-        <p [ngClass]="formType === 'non-modal' ? 'margin-left' : undefined" class="centered margin-right">Filter
-          name</p>
-        <mat-form-field id="filterName" appearance="outline"
-                        [floatLabel]="'auto'" class="centered margin-right">
-          <input formControlName="filterName" matInput placeholder="My Filter 1">
-        </mat-form-field>
+      <div class="form-row">
+        <div class="label"><p [ngClass]="formType === 'non-modal' ? 'margin-left' : undefined"
+                              class="centered margin-right width-100">Filter
+          name</p></div>
+        <div class="field">
+          <mat-form-field id="filterName" appearance="outline"
+                          [floatLabel]="'auto'" class="centered margin-right">
+            <input formControlName="filterName" matInput placeholder="My Filter 1">
+          </mat-form-field>
+        </div>
       </div>
-      <div class="flex">
-        <p [ngClass]="formType === 'non-modal' ? 'margin-left' : undefined" class="margin-right">Criteria</p>
-        <div formArrayName="criteriaList" class="form-array">
+      <div class="form-row">
+        <div class="label">
+          <p [ngClass]="formType === 'non-modal' ? 'margin-left' : undefined" class="margin-right width-100">
+            Criteria</p>
+        </div>
+        <div formArrayName="criteriaList" class="field">
           <div *ngFor="let criteriaList of criteriaListAllData.controls; let i = index"
                class="margin-left-2" [formGroupName]="i">
             <app-dropdown [defaultValue]="criteriaList.value.type" [options]="criteriaTypes"
                           (optionSelected)="handleOptionSelected($event, i)"
                           class="criteria-mat-form-filed">
             </app-dropdown>
-
-
             <app-dropdown [options]="getComparisonOperators(i)" (optionSelected)="setComparisonOperator($event, i)"
                           class="criteria-mat-form-filed">
             </app-dropdown>
-
             <mat-form-field class="criteria-mat-form-filed" appearance="outline"
-                            *ngIf="getType(criteriaListAllData.at(i)) === AMOUNT">
+                            *ngIf="getType(criteriaListAllData.at(i)) === CriteriaType.AMOUNT">
               <input formControlName="value" type="number" matInput placeholder="12345">
             </mat-form-field>
-
             <mat-form-field class="criteria-mat-form-filed" appearance="outline"
-                            *ngIf="getType(criteriaListAllData.at(i))  === TITLE">
+                            *ngIf="getType(criteriaListAllData.at(i))  === CriteriaType.TITLE">
               <input formControlName="value" type="text" matInput placeholder="Meow">
             </mat-form-field>
-
             <mat-form-field class="criteria-mat-form-filed" appearance="outline"
-                            *ngIf="getType(criteriaListAllData.at(i))  === DATE">
+                            *ngIf="getType(criteriaListAllData.at(i))  === CriteriaType.DATE">
               <input formControlName="value" placeholder="3/27/2024" matInput [matDatepicker]="picker">
               <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
               <mat-datepicker #picker></mat-datepicker>
             </mat-form-field>
             <button (click)="deleteRow(i)" mat-raised-button color="accent">—</button>
           </div>
+          <div class="add-criteria-button-position">
+            <button mat-raised-button color="primary" class="add-criteria-button" type="button" (click)="addCriteria()">
+              + Add
+              Criteria
+            </button>
+          </div>
         </div>
       </div>
+      <div class="form-row">
+        <div class="label">
+          <p [ngClass]="formType === 'non-modal' ? 'margin-left' : undefined"
+                              class="margin-right width-100">Selection</p>
+        </div>
+        <mat-radio-group class="field" aria-label="Select a selector" style="display: flex; padding-top: 1rem" formControlName="selection">
+          <div *ngFor="let option of selections">
+            <mat-radio-button [value]="option.name" value="1">{{ option.name }}</mat-radio-button>
+          </div>
+        </mat-radio-group>
+      </div>
     </form>
-    <div class="centered">
-      <button mat-raised-button color="primary" class="add-criteria-button" type="button" (click)="addCriteria()">+ Add
-        Criteria
-      </button>
-    </div>
+
   </mat-dialog-content>
   <mat-dialog-actions class="dialog-actions">
     <button mat-raised-button color="primary" class="mat-elevation-z0 close-button" type="button"

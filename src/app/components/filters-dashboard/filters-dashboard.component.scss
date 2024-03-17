@@ -1,0 +1,41 @@
+
+.dashboard {
+  display: flex;
+  padding: 2rem;
+  gap: 2rem;
+}
+
+
+.selection-list {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+  padding: 0;
+}
+
+.modal {
+  height: 100%;
+}
+
+.toggle {
+  display: flex;
+  width: calc(70% - 2rem);
+  align-items: flex-start;
+  flex-direction: column;
+
+  mat-button-toggle {
+    padding-bottom: 0.5rem;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .dashboard {
+    flex-direction: column;
+  }
+  .selection-list, .toggle {
+    width: 100%;
+  }
+  .modal {
+    width: 100%;
+  }
+}

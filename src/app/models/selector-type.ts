@@ -1,4 +1,4 @@
 export interface SelectorType {
-  name: string,
-  value: string
+  name: string;
+  value: string;
 }

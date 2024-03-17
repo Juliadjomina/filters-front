@@ -1,10 +1,11 @@
+<app-filters-header></app-filters-header>
 <div class="dashboard">
   <mat-selection-list #filters [multiple]="false" hideSingleSelectionIndicator class="selection-list">
     <ng-container *ngFor="let filter of filterResponses; let i = index">
       <mat-list-option [value]="filter" (click)="getFilterCriteria(filters, filter.id, i)">
         Filter name: {{ filter.filterName }}
       </mat-list-option>
-      <div *ngIf="criteria.length > 0 && filters.selectedOptions.selected[0].value == filter">
+      <div *ngIf="criteria.length > 0 && filters.selectedOptions.selected[0].value === filter">
         <table mat-table [dataSource]="criteria" class="mat-elevation-z8">
           <ng-container matColumnDef="type">
             <th mat-header-cell *matHeaderCellDef> Type</th>
@@ -30,7 +31,6 @@
       <mat-button-toggle value="modal">Modal</mat-button-toggle>
       <mat-button-toggle value="non-modal">Non-modal</mat-button-toggle>
     </mat-button-toggle-group>
-    <app-modal class="modal" [formType]="formType" [comparisonOperators]="comparisonOperators"
-               [criteriaTypes]="criteriaTypes"></app-modal>
+    <app-modal class="modal" [formType]="formType"></app-modal>
   </div>
 </div>

@@ -1,22 +1,24 @@
+import {CriteriaType} from "../shared/utils/utils";
+
 export interface ComparisonOperator {
   operatorName: string;
-  operatorType: 'TITLE' | 'AMOUNT' | 'DATE';
+  operatorType: CriteriaType;
 }
 
 export interface TitleCriteria {
-  criteriaType: 'TITLE';
+  criteriaType: CriteriaType.TITLE;
   comparisonOperator: ComparisonOperator;
   title: string;
 }
 
 export interface AmountCriteria {
-  criteriaType: 'AMOUNT';
+  criteriaType: CriteriaType.AMOUNT;
   comparisonOperator: ComparisonOperator;
   amount: number;
 }
 
 export interface DateCriteria {
-  criteriaType: 'DATE';
+  criteriaType: CriteriaType.DATE;
   comparisonOperator: ComparisonOperator;
   date: Date;
 }
