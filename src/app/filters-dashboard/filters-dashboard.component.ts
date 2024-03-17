@@ -30,21 +30,29 @@ export class FiltersDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.filterService.getAllFilters().subscribe(filters => this.filterResponses = filters);
-    this.sharedService.getData().subscribe(_ => {
-      this.formType = '';
+    this.loadFilters();
+    this.sharedService.getFilterSaved().subscribe(isFilterSaved => {
+      if (isFilterSaved) {
+        this.formType = '';
+        this.loadFilters();
+      }
     });
   }
 
+  loadFilters() {
+    this.filterService.getAllFilters().subscribe(filters => this.filterResponses = filters);
+  }
+
   getFilterCriteria(a: MatSelectionList, filterId: number, i: number) {
-    this.criteria = [];
     if (this.previousSelectedIndex !== -1 && this.previousSelectedIndex !== i) {
       const selectedOption = a.options.toArray()[this.previousSelectedIndex];
       a.selectedOptions.deselect(selectedOption);
+      this.criteria = [];
     }
-    if (this.previousSelectedIndex == i) {
+    if (this.previousSelectedIndex == i && this.criteria.length != 0) {
       const selectedOption = a.options.toArray()[this.previousSelectedIndex];
       a.selectedOptions.deselect(selectedOption);
+      this.criteria = [];
     } else {
       this.criteriaService.getFilterCriteria(filterId)
         .subscribe(criteria => this.criteria = criteria);
@@ -61,9 +69,5 @@ export class FiltersDashboardComponent implements OnInit {
       return (criteria as AmountCriteria).amount;
     }
     return '';
-  }
-
-  @HostListener('changeModalMode') onMouseEnter() {
-    this.formType = '';
   }
 }

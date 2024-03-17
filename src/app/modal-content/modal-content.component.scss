@@ -6,7 +6,6 @@
 .centered {
   display: flex;
   align-items: center;
-  margin-right: 10px;
 }
 
 .title {
@@ -14,15 +13,58 @@
   color: white
 }
 
-.test {
+.margin-left {
   margin-left: 1rem;
 }
 
-.widthtest {
+.margin-left-2 {
+  margin-left: 2rem;
+}
+
+.non-modal-width {
   width: 90%;
 }
 
-.widthtest2 {
-  width: 40%;
+.modal-content {
+  height: 60%;
 }
 
+.dialog-content {
+  height: 40vh;
+  max-height: 40vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.margin-right {
+  margin-right: 10px;
+}
+
+.save-filter-button {
+  background-color: #156bba
+}
+
+.close-button {
+  background-color: #757575
+}
+
+.add-criteria-button {
+  background-color: #757575
+}
+
+.dialog-actions {
+  background-color: #f1f1f1;
+  display: flex;
+  justify-content: center;
+}
+
+.form-array {
+  height: 100%;
+  width: 100%
+}
+
+.flex {
+  display: flex;
+}

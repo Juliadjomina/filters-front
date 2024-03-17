@@ -20,10 +20,11 @@ import {SharedService} from "../shared/service/shared-service";
 })
 export class ModalContentComponent {
 
-  @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
-  @Input() showModal: string = '';
+  @Input() formType: string = '';
   @Input() criteriaTypes: SelectorType[] = [];
   @Input() comparisonOperators: SelectorType[] = [];
+  @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
+
   filterForm: FormGroup = this.formBuilder.group({
     filterName: [''],
     criteriaList: this.formBuilder.array([this.createCriteria()])
@@ -35,59 +36,17 @@ export class ModalContentComponent {
               private snackBar: MatSnackBar,
               private filterService: FiltersService,
               private sharedService: SharedService) {
+
     this.criteriaTypeService.getCriteriaTypes().subscribe(criteriaTypes => {
       this.criteriaTypes = this.transformCriteriaToSelectorType(criteriaTypes);
     });
     this.comparisonOperatorService.getComparisonOperator().subscribe(comparisonOperators => {
-      this.comparisonOperators = this.transformComparisonOperatorToSlectorType(comparisonOperators);
+      this.comparisonOperators = this.transformComparisonOperatorToSelectorType(comparisonOperators);
     });
   }
 
-  transformCriteriaToSelectorType(criteria: CriteriaType[]): SelectorType[] {
-    return criteria.map(criterion => ({
-      name: criterion.type,
-      value: ""
-    }));
-  }
-
-  transformComparisonOperatorToSlectorType(criteria: ComparisonOperator[]): SelectorType[] {
-    return criteria.map(criterion => ({
-      name: criterion.operatorName,
-      value: criterion.operatorType
-    }));
-  }
-
-  handleOptionSelected(value: string, index: number) {
-    const criteriaList = this.filterForm.get('criteriaList') as FormArray;
-    const criteriaFormGroup = criteriaList.at(index) as FormGroup;
-    criteriaFormGroup.controls['type'].setValue(value);
-  }
-
-
-  getComparisonOperators(value: number) {
-    if (value) {
-
-      const criteriaList = this.filterForm.get('criteriaList') as FormArray;
-      const criteriaFormGroup = criteriaList.at(value) as FormGroup;
-      return this.comparisonOperators.filter(operator => operator.value === criteriaFormGroup.value['type']);
-    } else {
-      return this.comparisonOperators.filter(operator => operator.value === AMOUNT);
-    }
-  }
-
-  setComparisonOperator(option: string, i: number) {
-    const criteriaList = this.filterForm.get('criteriaList') as FormArray;
-    const criteriaFormGroup = criteriaList.at(i) as FormGroup;
-    criteriaFormGroup.controls['comparisonOperator'].setValue(option);
-  }
-
-
-  getType(optionSelected: AbstractControl<any>): string {
-    return optionSelected.value['type'];
-  }
-
-  get criteriaListAllData(): FormArray {
-    return this.filterForm.controls["criteriaList"] as FormArray;
+  addCriteria(): void {
+    (this.filterForm.get('criteriaList') as FormArray).push(this.createCriteria());
   }
 
   createCriteria(): FormGroup {
@@ -96,17 +55,6 @@ export class ModalContentComponent {
       value: [''],
       comparisonOperator: ['']
     });
-  }
-
-  addCriteria(): void {
-    (this.filterForm.get('criteriaList') as FormArray).push(this.createCriteria());
-  }
-
-  collectFilterData(): FilterRequest {
-    return {
-      filterName: this.filterForm.get('filterName')?.value,
-      criteriaList: this.mapFormArrayToCriteriaList(this.filterForm.get('criteriaList') as FormArray)
-    };
   }
 
   mapFormArrayToCriteriaList(criteriaList: FormArray): Criteria[] {
@@ -126,13 +74,8 @@ export class ModalContentComponent {
     return criteriaResponses;
   }
 
-  validateCriteria(): boolean {
-    return (this.filterForm.get('criteriaList') as FormArray).controls.every((criteriaGroup: AbstractControl) => {
-      const type = criteriaGroup.get('type')?.value;
-      const comparisonOperator = criteriaGroup.get('comparisonOperator')?.value;
-      const value = criteriaGroup.get('value')?.value;
-      return !isNullOrWhitespace(type) && !isNullOrWhitespace(comparisonOperator) && isValidCriteriaValue(value);
-    });
+  onCloseModal() {
+    this.closeModal.emit();
   }
 
   saveFilter(): void {
@@ -147,7 +90,7 @@ export class ModalContentComponent {
     this.filterService.saveFilter(this.collectFilterData()).subscribe();
     this.closeModal.emit();
     this.openSnackBar("Filter is successfully added")
-    if (this.showModal === 'non-modal') {
+    if (this.formType === 'non-modal') {
       this.filterForm.reset(
         {
           filterName: '',
@@ -155,7 +98,16 @@ export class ModalContentComponent {
         }
       );
     }
-    this.sharedService.setData("a");
+    this.sharedService.setFilterSaved(true);
+  }
+
+  validateCriteria(): boolean {
+    return (this.filterForm.get('criteriaList') as FormArray).controls.every((criteriaGroup: AbstractControl) => {
+      const type = criteriaGroup.get('type')?.value;
+      const comparisonOperator = criteriaGroup.get('comparisonOperator')?.value;
+      const value = criteriaGroup.get('value')?.value;
+      return !isNullOrWhitespace(type) && !isNullOrWhitespace(comparisonOperator) && isValidCriteriaValue(value);
+    });
   }
 
   validateFilter() {
@@ -167,8 +119,63 @@ export class ModalContentComponent {
     }
   }
 
+  collectFilterData(): FilterRequest {
+    return {
+      filterName: this.filterForm.get('filterName')?.value,
+      criteriaList: this.mapFormArrayToCriteriaList(this.filterForm.get('criteriaList') as FormArray)
+    };
+  }
+
   deleteRow(index: number) {
     (this.filterForm.get('criteriaList') as FormArray).removeAt(index);
+  }
+
+  openSnackBar(message: string) {
+    this.snackBar.open(message, 'Close', {
+      horizontalPosition: "end",
+      verticalPosition: "top",
+      duration: 3000
+    });
+  }
+
+  transformCriteriaToSelectorType(criteria: CriteriaType[]): SelectorType[] {
+    return criteria.map(criterion => ({
+      name: criterion.type,
+      value: ""
+    }));
+  }
+
+  transformComparisonOperatorToSelectorType(criteria: ComparisonOperator[]): SelectorType[] {
+    return criteria.map(criterion => ({
+      name: criterion.operatorName,
+      value: criterion.operatorType
+    }));
+  }
+
+  handleOptionSelected(value: string, index: number) {
+    const criteriaList = this.filterForm.get('criteriaList') as FormArray;
+    const criteriaFormGroup = criteriaList.at(index) as FormGroup;
+    criteriaFormGroup.controls['type'].setValue(value);
+  }
+
+  getComparisonOperators(value: number) {
+    const criteriaList = this.filterForm.get('criteriaList') as FormArray;
+    const criteriaFormGroup = criteriaList.at(value) as FormGroup;
+    return this.comparisonOperators.filter(operator => operator.value === criteriaFormGroup.value['type']);
+  }
+
+  setComparisonOperator(option: string, i: number) {
+    const criteriaList = this.filterForm.get('criteriaList') as FormArray;
+    const criteriaFormGroup = criteriaList.at(i) as FormGroup;
+    criteriaFormGroup.controls['comparisonOperator'].setValue(option);
+  }
+
+  getType(optionSelected: AbstractControl<any>): string {
+    return optionSelected.value['type'];
+  }
+
+  get criteriaListAllData(): FormArray {
+    return this.filterForm.controls["criteriaList"] as FormArray;
   }
 
   private collectCriteria(type: string, comparisonOperator: string, value: string | number | Date) {
@@ -206,18 +213,6 @@ export class ModalContentComponent {
       default:
         return '';
     }
-  }
-
-  onCloseModal() {
-    this.closeModal.emit();
-  }
-
-  openSnackBar(message: string) {
-    this.snackBar.open(message, 'Close', {
-      horizontalPosition: "end",
-      verticalPosition: "top",
-      duration: 3000
-    });
   }
 
   protected readonly AMOUNT = AMOUNT;

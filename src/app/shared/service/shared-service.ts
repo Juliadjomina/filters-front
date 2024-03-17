@@ -10,11 +10,11 @@ export class SharedService {
 
   constructor() { }
 
-  setData(data: any): void {
+  setFilterSaved(data: boolean): void {
     this.dataSubject.next(data);
   }
 
-  getData(): Observable<any> {
+  getFilterSaved(): Observable<boolean> {
     return this.dataSubject.asObservable();
   }
 }

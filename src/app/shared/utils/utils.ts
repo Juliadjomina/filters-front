@@ -1,4 +1,3 @@
-
 export const AMOUNT: string = 'AMOUNT';
 export const TITLE: string = 'TITLE';
 export const DATE: string = 'DATE';
@@ -18,4 +17,3 @@ export function isValidCriteriaValue(input: string | number | Date): boolean {
     return false;
   }
 }
-

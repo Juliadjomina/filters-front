@@ -2,6 +2,10 @@
   display: -webkit-box;
   background-color: #5ebecb;
   padding-left: 1rem;
-  padding-right: 1rem;
   height: 3rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
 }

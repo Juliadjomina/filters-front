@@ -12,13 +12,13 @@ export class ModalComponent {
 
   @Input() criteriaTypes: SelectorType[] = [];
   @Input() comparisonOperators: SelectorType[] = [];
-  @Input() showModal: string = '';
+  @Input() formType: string = '';
 
   constructor(public dialog: MatDialog) {
   }
 
   openDialog() {
-    if (this.showModal === 'modal') {
+    if (this.formType === 'modal') {
       const dialogRef = this.dialog.open(ModalContentComponent, {
         disableClose: false,
         width: '60%',

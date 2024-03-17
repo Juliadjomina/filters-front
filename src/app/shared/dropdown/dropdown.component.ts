@@ -3,8 +3,7 @@ import {SelectorType} from "../../_models/selector-type";
 
 @Component({
   selector: 'app-dropdown',
-  templateUrl: './dropdown.component.html',
-  styleUrls: ['./dropdown.component.scss'],
+  templateUrl: './dropdown.component.html'
 })
 export class DropdownComponent implements OnInit {
 
@@ -13,13 +12,13 @@ export class DropdownComponent implements OnInit {
   @Output() optionSelected = new EventEmitter<string>();
   selectedOption: string = '';
 
+  ngOnInit(): void {
+    this.selectedOption = this.defaultValue;
+  }
+
   selectOption(option: string) {
     this.selectedOption = option;
     this.optionSelected.emit(option);
 
-  }
-
-  ngOnInit(): void {
-    this.selectedOption = this.defaultValue;
   }
 }

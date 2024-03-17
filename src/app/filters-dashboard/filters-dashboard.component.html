@@ -1,37 +1,36 @@
-
-<div class="dashboard" >
-<mat-selection-list  #filters [multiple]="false" hideSingleSelectionIndicator class="selection-list">
-  <ng-container *ngFor="let filter of filterResponses; let i = index" >
-    <mat-list-option id="allOption" [value]="filter" (click)="getFilterCriteria(filters, filter.id, i)">Filter name: {{ filter.filterName }}
-    </mat-list-option>
-    <div *ngIf="criteria.length > 0 && filters.selectedOptions.selected[0].value == filter">
-      <ng-container >
-        <table aria-description="criteriaTable" mat-table [dataSource]="criteria" class="mat-elevation-z8">
+<div class="dashboard">
+  <mat-selection-list #filters [multiple]="false" hideSingleSelectionIndicator class="selection-list">
+    <ng-container *ngFor="let filter of filterResponses; let i = index">
+      <mat-list-option [value]="filter" (click)="getFilterCriteria(filters, filter.id, i)">
+        Filter name: {{ filter.filterName }}
+      </mat-list-option>
+      <div *ngIf="criteria.length > 0 && filters.selectedOptions.selected[0].value == filter">
+        <table mat-table [dataSource]="criteria" class="mat-elevation-z8">
           <ng-container matColumnDef="type">
-            <th mat-header-cell *matHeaderCellDef> Type </th>
-            <td mat-cell *matCellDef="let element"> {{element.comparisonOperator.operatorType}} </td>
+            <th mat-header-cell *matHeaderCellDef> Type</th>
+            <td mat-cell *matCellDef="let element"> {{ element.comparisonOperator.operatorType }}</td>
           </ng-container>
           <ng-container matColumnDef="operator">
-            <th mat-header-cell *matHeaderCellDef> Operator </th>
-            <td mat-cell *matCellDef="let element"> {{element.comparisonOperator.operatorName}} </td>
+            <th mat-header-cell *matHeaderCellDef> Operator</th>
+            <td mat-cell *matCellDef="let element"> {{ element.comparisonOperator.operatorName }}</td>
           </ng-container>
           <ng-container matColumnDef="value">
-            <th mat-header-cell *matHeaderCellDef> Value </th>
-            <td mat-cell *matCellDef="let element"> {{getCriteriaValue(element)}} </td>
+            <th mat-header-cell *matHeaderCellDef> Value</th>
+            <td mat-cell *matCellDef="let element"> {{ getCriteriaValue(element) }}</td>
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
-      </ng-container>
-    </div>
-  </ng-container>
-</mat-selection-list>
-<div class="IMHERE" style="width: 70%; margin-left: 1rem">
-  <mat-button-toggle-group [(ngModel)]="formType" name="fontStyle" aria-label="Font Style" #group="matButtonToggleGroup">
-    <mat-button-toggle value="modal">Modal</mat-button-toggle>
-    <mat-button-toggle value="non-modal">Non-modal</mat-button-toggle>
-  </mat-button-toggle-group>
-
-  <app-modal class="modal" [showModal]="formType" [comparisonOperators]="comparisonOperators" [criteriaTypes]="criteriaTypes"></app-modal>
-</div>
+      </div>
+    </ng-container>
+  </mat-selection-list>
+  <div class="toggle">
+    <mat-button-toggle-group [(ngModel)]="formType" name="fontStyle"
+                             #group="matButtonToggleGroup">
+      <mat-button-toggle value="modal">Modal</mat-button-toggle>
+      <mat-button-toggle value="non-modal">Non-modal</mat-button-toggle>
+    </mat-button-toggle-group>
+    <app-modal class="modal" [formType]="formType" [comparisonOperators]="comparisonOperators"
+               [criteriaTypes]="criteriaTypes"></app-modal>
+  </div>
 </div>
