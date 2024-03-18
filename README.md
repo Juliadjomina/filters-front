@@ -2,6 +2,10 @@
 
 ## Rakenduse lokaalne käivitamine
 
+Node versioon 16.15.0
+
+Npm version 9.8.1
+
 Juurkaustas:
 
 1. Käivitada `npm install` et sõltuvused alla laadida
