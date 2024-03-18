@@ -128,12 +128,7 @@ export class ModalContentComponent {
   }
 
   validateFilter() {
-    if (isNullOrWhitespace(this.filterForm.get('filterName')?.value)) {
-      this.filterForm.get('filterName')?.setErrors(Validators.required);
-      return false;
-    } else {
-      return true;
-    }
+    return !isNullOrWhitespace(this.filterForm.get('filterName')?.value);
   }
 
   collectFilterData(): FilterRequest {

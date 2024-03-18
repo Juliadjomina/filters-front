@@ -70,4 +70,8 @@ export class FiltersDashboardComponent implements OnInit {
     }
     return '';
   }
+
+  getFilterTitle(filter: FilterResponse): string {
+    return `${filter.filterName ? 'Filter name: ' + filter.filterName + ' ' : ''}${filter.selectionName ? 'with selection: ' + filter.selectionName : ''}`.trim();
+  }
 }
