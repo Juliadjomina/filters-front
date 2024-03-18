@@ -1,7 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { HttpBaseService } from './http-base.service';
-import { ComparisonOperator } from '../models/comparison-operator';
+import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
+import {HttpBaseService} from './http-base.service';
 import {Selection} from "../models/selection";
 
 @Injectable({

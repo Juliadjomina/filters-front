@@ -7,6 +7,7 @@ import {CriteriaTypeResponse} from '../models/criteria-type';
   providedIn: 'root',
 })
 export class CriteriaTypeService extends HttpBaseService {
+
   getCriteriaTypes(): Observable<CriteriaTypeResponse[]> {
     return this.http.get<CriteriaTypeResponse[]>(`api/criteria-types`);
   }

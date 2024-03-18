@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {FiltersService} from '../../services/filters.service';
 import {FilterResponse} from '../../models/filter-response';
 import {CriteriaService} from '../../services/criteria.service';
-import {AmountCriteria, Criteria, DateCriteria, TitleCriteria,} from '../../models/criteria';
+import {Criteria,} from '../../models/criteria';
 import {MatSelectionList} from '@angular/material/list';
 import {SharedService} from '../../shared/service/shared-service';
 import {CriteriaType} from '../../shared/utils/utils';
@@ -13,6 +13,7 @@ import {CriteriaType} from '../../shared/utils/utils';
   styleUrls: ['./filters-dashboard.component.scss'],
 })
 export class FiltersDashboardComponent implements OnInit {
+
   filterResponses: FilterResponse[] = [];
   criteria: Criteria[] = [];
   formType: string = '';
@@ -44,7 +45,7 @@ export class FiltersDashboardComponent implements OnInit {
 
   getFilterCriteria(filters: MatSelectionList, filterId: number, index: number) {
     if (this.previousSelectedIndex !== -1 && this.previousSelectedIndex !== index) {
-      const selectedOption  = Array.from(filters.options)[this.previousSelectedIndex];
+      const selectedOption = Array.from(filters.options)[this.previousSelectedIndex];
       filters.selectedOptions.deselect(selectedOption);
       this.criteria = [];
     }

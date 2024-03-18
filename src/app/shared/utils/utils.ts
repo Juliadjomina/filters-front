@@ -1,7 +1,3 @@
-export const AMOUNT: string = 'AMOUNT';
-export const TITLE: string = 'TITLE';
-export const DATE: string = 'DATE';
-
 export enum CriteriaType {
   AMOUNT = 'AMOUNT',
   TITLE = 'TITLE',

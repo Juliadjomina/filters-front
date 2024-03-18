@@ -1,4 +1,4 @@
-import { Criteria } from './criteria';
+import {Criteria} from './criteria';
 
 export interface FilterRequest {
   filterName: string;

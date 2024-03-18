@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {AbstractControl, FormArray, FormBuilder, FormGroup, Validators,} from '@angular/forms';
+import {AbstractControl, FormArray, FormBuilder, FormGroup,} from '@angular/forms';
 import {SelectorType} from '../../models/selector-type';
 import {CriteriaTypeService} from '../../services/criteria-type.service';
 import {ComparisonOperatorService} from '../../services/comparison-operator.service';
@@ -8,11 +8,12 @@ import {FiltersService} from '../../services/filters.service';
 import {FilterRequest} from '../../models/filter-request';
 import {AmountCriteria, Criteria, DateCriteria, TitleCriteria,} from '../../models/criteria';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {AMOUNT, CriteriaType, isNullOrWhitespace, isValidCriteriaValue,} from '../../shared/utils/utils';
+import {CriteriaType, isNullOrWhitespace, isValidCriteriaValue,} from '../../shared/utils/utils';
 import {SharedService} from '../../shared/service/shared-service';
 import {CriteriaTypeResponse} from "../../models/criteria-type";
 import {SelectionService} from "../../services/selection.service";
 import {Selection} from "../../models/selection";
+import {tap} from "rxjs";
 
 @Component({
   selector: 'app-modal-content',
@@ -20,6 +21,7 @@ import {Selection} from "../../models/selection";
   styleUrls: ['./modal-content.component.scss'],
 })
 export class ModalContentComponent {
+
   @Input() formType: string = '';
   @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
   criteriaTypes: SelectorType[] = [];
@@ -44,8 +46,8 @@ export class ModalContentComponent {
       this.criteriaTypes = this.transformCriteriaToSelectorType(criteriaTypes);
     });
     this.comparisonOperatorService.getComparisonOperator().subscribe((comparisonOperators) => {
-        this.comparisonOperators = this.transformComparisonOperatorToSelectorType(comparisonOperators);
-      });
+      this.comparisonOperators = this.transformComparisonOperatorToSelectorType(comparisonOperators);
+    });
     this.selectionService.getSelections().subscribe((selections) => {
       this.selections = this.transformSelectionsToSelectorType(selections);
     })
@@ -59,7 +61,7 @@ export class ModalContentComponent {
 
   createCriteria(): FormGroup {
     return this.formBuilder.group({
-      type: [AMOUNT],
+      type: [CriteriaType.AMOUNT],
       value: [''],
       comparisonOperator: [''],
     });
@@ -99,16 +101,17 @@ export class ModalContentComponent {
       );
       return;
     }
-    this.filterService.saveFilter(this.collectFilterData()).subscribe();
-    this.closeModal.emit();
-    this.openSnackBar('Filter is successfully added');
-    if (this.formType === 'non-modal') {
-      this.filterForm.reset({
-        filterName: '',
-        criteriaList: this.formBuilder.array([this.createCriteria()]),
-      });
-    }
-    this.sharedService.setFilterSaved(true);
+    this.filterService.saveFilter(this.collectFilterData()).pipe(tap(() => {
+      this.closeModal.emit();
+      this.openSnackBar('Filter is successfully added');
+      if (this.formType === 'non-modal') {
+        this.filterForm.reset({
+          filterName: '',
+          criteriaList: this.formBuilder.array([this.createCriteria()]),
+        });
+      }
+      this.sharedService.setFilterSaved(true);
+    })).subscribe();
   }
 
   validateCriteria(): boolean {

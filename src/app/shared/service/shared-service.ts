@@ -5,6 +5,7 @@ import {BehaviorSubject, Observable} from 'rxjs';
   providedIn: 'root',
 })
 export class SharedService {
+
   private dataSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
   constructor() {
